@@ -1,13 +1,4 @@
-grid points
-
-
-gridpoints=[]
-for i in range(0,11):
-	for j in range(0,11):
-		gridpoints.append((i,j))
-
-
-Node Class
+Class Node:
 	def __init__(self,value,point)
 		self.value = value
 		self.point = point
@@ -16,11 +7,13 @@ Node Class
 	def move_cost(self,other):
 		return 0 if self.value == '.' else 1
 
-# make each gridpoint into a note
-S=(a,b)
-OpenNodes=[]
-OpenNodes.append((S,S.fcost))
-ClosedNodes=[]
+def succ(point,grid):
+    x,y = point.point
+    links = [grid[d[0]][d[1]] for d in [(x-1, y),(x,y - 1),(x,y + 1),(x+1,y)]]
+return [link for link in links if link.value != '%']
+
+def heuristic(point,point2):
+return abs(point.point[0] - point2.point[0]) + abs(point.point[1]-point2.point[0])
 
 def aStar(start, goal, graph)
 	# Open and closed sets
@@ -40,6 +33,40 @@ def aStar(start, goal, graph)
 			while current.parent:
 				path.append(current)
 				current = current.parent
+			path.append(current)
+			return path[::-1]
+		# Remove node from the open ndoes
+		openNodes.remove(current)
+		# Add current node to the closed nodes
+		closedNodes.add(current)
+        	#Iterate through the current node's successors
+        	for node in succ(current,grid):
+        		# If i already in the closed nodes then skip it   
+        		if node in closedNodes:
+                		continue
+			# Else, it is already in openNodes
+			if node in openNodes:
+				#Check if we beat the G score 
+				new_g = current.G + current.move_cost(node)
+				if node.G > new_g:
+			# then provide node with a new parent
+					node.G = new_g
+					node.parent = current
+			else:
+				#If it isn't in the open set, calculate the G and H score for the node
+				node.G = current.G + current.move_cost(node)
+				node.H = heuristic(node, goal)
+				#Set the parent to our current item
+				node.parent = current
+				#Add it to the set
+				openNodes.add(node)
+	#Throw an exception if there is no path
+	raise ValueError('No Path Found')
+		
+		
+		
+		
+		
 		if neighbor.walkable=True:
 			add neighbors to open list
 	order the OpenNodes by fcost
